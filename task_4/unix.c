@@ -1,11 +1,8 @@
-#include <stdio.h>
 #include <stdlib.h>
 #include <fcntl.h>
 #include <unistd.h>
 
-#define KRED  "\x1B[31m"
-#define KGRN  "\x1B[32m"
-#define KNRM  "\x1B[0m"
+#include "../helpers/iohelpers.h"
 
 #define INPUT_HANDLE 0
 #define OUTPUT_HANDLE 1
