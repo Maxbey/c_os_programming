@@ -1,14 +1,16 @@
-#include <unistd.h>
-#include <stdlib.h>
+#include <stdio.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 
-#define INPUT_HANDLE 0
-#define OUTPUT_HANDLE 1
-#define ERROR_HANDLE 2
+#include "../helpers/unix/stdhandles.h"
 
 void read_write(int, int, int);
+
+/*
+  Required:
+  unix/stream_helpers
+*/
 
 int main(int argc, char *argv[]){
     char input_buffer[255] = "";
@@ -20,28 +22,15 @@ int main(int argc, char *argv[]){
     //Set offset
     lseek(first_handle, 10, SEEK_SET);
 
-    write_line(OUTPUT_HANDLE, "First handle: ");
-    write_int(OUTPUT_HANDLE, first_handle);
+    printf("First handle %d\n", first_handle);
+    printf("Second handle %d\n", second_handle);
+    printf("Third handle %d\n\n", third_handle);
 
-    write_line(OUTPUT_HANDLE, "\nSecond handle: ");
-    write_int(OUTPUT_HANDLE, second_handle);
-
-    write_line(OUTPUT_HANDLE, "\nThird handle: ");
-    write_int(OUTPUT_HANDLE, third_handle);
-
-    //Read from first handle
-    write_line(OUTPUT_HANDLE, "\nRead from first: ");
     read_write(first_handle, OUTPUT_HANDLE, 7);
 
-    //Read from second handle
-    write_line(OUTPUT_HANDLE, "\nRead from second: ");
     read_write(second_handle, OUTPUT_HANDLE, 7);
 
-    //Read from third handle
-    write_line(OUTPUT_HANDLE, "\nRead from third: ");
     read_write(third_handle, OUTPUT_HANDLE, 7);
-
-    write_line(OUTPUT_HANDLE, "\n\n");
 
     close(first_handle);
     close(second_handle);
@@ -50,20 +39,10 @@ int main(int argc, char *argv[]){
     return 0;
 }
 
-void write_line(int handle, char *line){
-    write(handle, line, strlen(line));
-}
-
 void read_write(int read_handle, int write_handle, int bytes){
     char buff[255];
 
-    read(read_handle, buff, bytes);
-    write_line(write_handle, buff);
-}
-
-void write_int(int handle, int i){
-    char buff[255] = "";
-    sprintf(buff, "%d", i);
-
-    write(handle, buff, strlen(buff));
+    stream_read(read_handle, buff, bytes);
+    stream_write(write_handle, buff);
+    stream_write(write_handle, "\n");
 }
