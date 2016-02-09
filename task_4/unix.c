@@ -1,13 +1,12 @@
 #include <stdlib.h>
-#include <stdio.h>
 #include <fcntl.h>
 #include <unistd.h>
 
+#include "../helpers/alert_helpers.h"
 #include "../helpers/unix/stdhandles.h"
 
 /*
   Required:
-  unix/stream_helpers.c
   alert_helpers.c
 */
 
@@ -62,6 +61,6 @@ int main(int argc, char *argv[]){
 void read_write(int read_handle, int write_handle, char *buff){
     ssize_t readed;
 
-    readed = stream_read(read_handle, buff, sizeof(buff));
-    stream_write(write_handle, buff, readed);
+    readed = read(read_handle, buff, sizeof(buff));
+    write(write_handle, buff, readed);
 }

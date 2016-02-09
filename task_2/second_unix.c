@@ -1,16 +1,12 @@
 #include <stdio.h>
 #include <sys/types.h>
+#include <unistd.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 
 #include "../helpers/unix/stdhandles.h"
 
 void read_write(int, int, int);
-
-/*
-  Required:
-  unix/stream_helpers
-*/
 
 int main(int argc, char *argv[]){
     char input_buffer[255] = "";
@@ -40,9 +36,10 @@ int main(int argc, char *argv[]){
 }
 
 void read_write(int read_handle, int write_handle, int bytes){
-    char buff[255];
+    char buff[7];
+    ssize_t readed;
 
-    stream_read(read_handle, buff, bytes);
-    stream_write(write_handle, buff);
-    stream_write(write_handle, "\n");
+    readed = read(read_handle, buff, bytes);
+    write(write_handle, buff, readed);
+    write(write_handle, "\n", 1);
 }
