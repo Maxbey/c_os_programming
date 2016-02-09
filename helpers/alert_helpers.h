@@ -7,4 +7,4 @@
 
 extern void get_error_alert(const char *, ...);
 extern void get_success_alert(const char *, ...);
-void get_colored_alert(char *, char *, va_list);
+void get_colored_alert(const char *, const char *, va_list);

@@ -1,66 +1,67 @@
 #include <stdlib.h>
+#include <stdio.h>
 #include <fcntl.h>
 #include <unistd.h>
 
-#include "../helpers/iohelpers.h"
+#include "../helpers/unix/stdhandles.h"
 
-#define INPUT_HANDLE 0
-#define OUTPUT_HANDLE 1
+/*
+  Required:
+  unix/stream_helpers.c
+  alert_helpers.c
+*/
+
+void read_write(int, int, char* buff);
 
 int main(int argc, char *argv[]){
     int file_handle;
+    char buff[255];
+
     struct flock lock = {F_WRLCK, SEEK_SET, 0, 0, 0};
 
     lock.l_pid = getpid();
 
     if ((file_handle = open(argv[1], O_RDWR)) == -1) {
-        printf("%sError: File not exist\n", KRED);
+        get_error_alert("Error: File not exist\n");
         exit(1);
     }
 
-    printf("%sFile \'%s\' opened...\n\n", KGRN, argv[1]);
+    get_success_alert("File \'%s\' opened...\n", argv[1]);
 
-    printf("%sPress ENTER to try to get lock: ", KNRM);
+    printf("\nPress ENTER to get lock");
     getchar();
     printf("Trying to get lock...\n");
 
     if (fcntl(file_handle, F_SETLKW, &lock) == -1) {
-        printf("%sError on locking\n", KRED);
+        get_error_alert("Error on locking\n");
         exit(1);
     }
+    get_success_alert("\nFile successfuly locked\n");
 
-    printf("%sFile successfuly locked\n", KGRN);
+    printf("\nPress ENTER to read file...");
+    getchar();
 
-    printf("Readed from file: ");
-    read_write(file_handle, OUTPUT_HANDLE, 1);
+    read_write(file_handle, OUTPUT_HANDLE, buff);
 
-    printf("%sPress ENTER to release lock: ", KNRM);
+    printf("\nPress ENTER to release lock: ");
     getchar();
 
     lock.l_type = F_UNLCK;
 
     if (fcntl(file_handle, F_SETLK, &lock) == -1) {
-        printf("%sError on unlocking\n", KRED);
+        get_error_alert("Error on unlocking\n");
         exit(1);
     }
 
-    printf("%sFile successfuly unlocked.\n", KGRN);
-
+    get_success_alert("File successfuly unlocked\n");
     close(file_handle);
-
-
-
 
     return 0;
 }
 
-void read_write(int read_handle, int write_handle, int bytes){
-    char buff[255];
+void read_write(int read_handle, int write_handle, char *buff){
+    ssize_t readed;
 
-    read(read_handle, buff, bytes);
-    write_line(write_handle, buff);
-}
-
-void write_line(int handle, char *line){
-    write(handle, line, strlen(line));
+    readed = stream_read(read_handle, buff, sizeof(buff));
+    stream_write(write_handle, buff, readed);
 }

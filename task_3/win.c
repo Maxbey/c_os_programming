@@ -57,9 +57,8 @@ int main(int argc, char *argv[]){
     printf("\n\nPress ENTER to realese lock");
     getchar();
 
-    get_success_alert("\n File successfuly unlocked");
-
     UnlockFileEx(file_handle, 0, 10000, 0, &overlapped);
+    get_success_alert("\n File successfuly unlocked");
 
     return 0;
 }
