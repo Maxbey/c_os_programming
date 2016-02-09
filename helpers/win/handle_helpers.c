@@ -4,7 +4,7 @@ HANDLE get_std_handle(int type){
   HANDLE handle = GetStdHandle(type);
 
   if(handle == INVALID_HANDLE_VALUE)
-      return -1;
+      return (HANDLE) -1;
 
   return handle;
 }

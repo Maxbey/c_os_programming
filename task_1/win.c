@@ -11,7 +11,7 @@ DWORD write_line(HANDLE, char*);
 
 DWORD print_string(HANDLE, char *);
 
-DWORD print_int(HANDLE, int);
+DWORD print_handle(HANDLE, int);
 
 int main(){
     char input_buffer[255] = "";
@@ -21,19 +21,19 @@ int main(){
 
     DWORD readed, written;
 
-    if(input_handle == -1 || output_handle == -1){
+    if(input_handle == (HANDLE) -1 || output_handle == (HANDLE) -1){
       get_error_alert("Wrong i/o handle");
     }
 
     print_string(output_handle, "The win standart input handle is ");
-    print_int(output_handle, input_handle);
+    print_handle(output_handle, input_handle);
 
     print_string(output_handle, "\nThe win standart output handle is ");
-    print_int(output_handle, output_handle);
+    print_handle(output_handle, output_handle);
 
-    print_line(output_handle, "\n\nJust type any text: ");
+    print_string(output_handle, "\n\nJust type any text: ");
 
-    ReadFile(input_handle, input_buffer, sizeof(buffer), &readed, 0);
+    ReadFile(input_handle, input_buffer, sizeof(input_buffer), &readed, 0);
     print_string(output_handle, "\nTyped text is: ");
 
     WriteFile(output_handle, input_buffer, readed, &written, 0);
@@ -54,9 +54,9 @@ DWORD print_string(HANDLE handle, char *string){
     return write_line(handle, string);
 }
 
-DWORD print_int(HANDLE handle, int i){
+DWORD print_handle(HANDLE handle, HANDLE h){
     char num_buff[30] = "";
-    itoa(i, buff, 10);
+    itoa((int) h, num_buff, 10);
 
     return write_line(handle, num_buff);
 }

@@ -5,9 +5,10 @@
 /*
   Required:
   win/handle_helpers.c
-  iohelpers.c
-  win/stream_helpers.c
+  alert_helpres
 */
+
+void read_write(HANDLE, HANDLE, char *);
 
 int main(int argc, char *argv[]){
     char buff[255] = "";
@@ -51,8 +52,7 @@ int main(int argc, char *argv[]){
     get_success_alert("\nFile successfuly locked\n");
     printf("\nFile contains: \n");
 
-    stream_read(file_handle, buff, 255);
-    stream_write(output_handle, buff);
+    read_write(file_handle, output_handle, buff);
 
     printf("\n\nPress ENTER to realese lock");
     getchar();
@@ -61,4 +61,11 @@ int main(int argc, char *argv[]){
     get_success_alert("\n File successfuly unlocked");
 
     return 0;
+}
+
+void read_write(HANDLE read_handle, HANDLE write_handle, char *buff){
+    DWORD readed, written;
+
+    ReadFile(read_handle, buff, sizeof(buff), &readed, 0);
+    WriteFile(write_handle, buff, readed, &written, 0);
 }
