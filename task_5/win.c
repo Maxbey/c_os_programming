@@ -59,8 +59,14 @@ void run(HANDLE input_handle, char *buff, int lines_count){
                   COORD coords = event.dwMousePosition;
                   if(coords.Y < lines_count && coords.X < strlen(lines[coords.Y]))
                   {
-                      get_warning_alert("Selected: %c\n", lines[coords.Y][coords.X]);
-                      printf("x: %d and y: %d\n\n", coords.X, coords.Y);
+                      char smb = lines[coords.Y][coords.X];
+
+                      if(smb != ' ')
+                      {
+                          get_warning_alert("Selected: %c\n", smb);
+                          printf("x: %d and y: %d\n\n", coords.X, coords.Y);
+                      }
+
                   }
 
               }
