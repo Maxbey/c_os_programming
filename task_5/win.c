@@ -3,11 +3,8 @@
 #include <windows.h>
 #include <winerror.h>
 
-char *substr(char *, int, int);
 void cls(HANDLE);
-char **split_on_lines(char *, char, int);
-int symbol_occurrences_count(char *, char);
-void run(HANDLE, char *, int);
+void run(HANDLE, HANDLE);
 
 int main(int argc, char *argv[]){
   char buff[1000];
@@ -35,16 +32,14 @@ int main(int argc, char *argv[]){
   WriteFile(output_handle, buff, readed, &written, 0);
   SetConsoleMode(input_handle, ENABLE_MOUSE_INPUT);
 
-  run(input_handle, buff, symbol_occurrences_count(buff, '\n'));
+  run(input_handle, output_handle);
 
   return 0;
 }
 
-void run(HANDLE input_handle, char *buff, int lines_count){
+void run(HANDLE input_handle, HANDLE output_handle){
   INPUT_RECORD console_buff;
   DWORD written;
-
-  char **lines = split_on_lines(buff, '\n', lines_count);
 
   while(1)
   {
@@ -56,24 +51,23 @@ void run(HANDLE input_handle, char *buff, int lines_count){
           {
               if(event.dwButtonState == FROM_LEFT_1ST_BUTTON_PRESSED)
               {
+                  DWORD readed;
                   COORD coords = event.dwMousePosition;
-                  if(coords.Y < lines_count && coords.X < strlen(lines[coords.Y]))
-                  {
-                      char smb = lines[coords.Y][coords.X];
+                  char result[2];
 
-                      if(smb != ' ')
-                      {
-                          get_warning_alert("Selected: %c\n", smb);
-                          printf("x: %d and y: %d\n\n", coords.X, coords.Y);
-                      }
+                  ReadConsoleOutputCharacter(output_handle, (LPTSTR) result, 1, coords, (LPDWORD) &readed);
 
-                  }
-
+                  if(result[0] != ' ')
+                      get_warning_alert(
+                        "Selected: %c on %d row and %d column\n",
+                        result[0],
+                        coords.Y,
+                        coords.X);
               }
 
               if(event.dwButtonState == FROM_LEFT_2ND_BUTTON_PRESSED)
               {
-                  get_success_alert("\nGoodbye :)");
+                  get_success_alert("\nGoodbye :)\n");
                   exit(1);
               }
           }
@@ -81,94 +75,41 @@ void run(HANDLE input_handle, char *buff, int lines_count){
   }
 }
 
-void cls( HANDLE hConsole )
+void cls(HANDLE hConsole)
 {
-   COORD coordScreen = { 0, 0 };    // home for the cursor
+   COORD coordScreen = {0, 0};
    DWORD cCharsWritten;
    CONSOLE_SCREEN_BUFFER_INFO csbi;
    DWORD dwConSize;
 
-// Get the number of character cells in the current buffer.
-
-   if( !GetConsoleScreenBufferInfo( hConsole, &csbi ))
+   if(!GetConsoleScreenBufferInfo(hConsole, &csbi))
    {
       return;
    }
 
    dwConSize = csbi.dwSize.X * csbi.dwSize.Y;
 
-   // Fill the entire screen with blanks.
-
-   if( !FillConsoleOutputCharacter( hConsole,        // Handle to console screen buffer
-                                    (TCHAR) ' ',     // Character to write to the buffer
-                                    dwConSize,       // Number of cells to write
-                                    coordScreen,     // Coordinates of first cell
-                                    &cCharsWritten ))// Receive number of characters written
+   if( !FillConsoleOutputCharacter(hConsole,
+                                    (TCHAR) ' ',
+                                    dwConSize,
+                                    coordScreen,
+                                    &cCharsWritten))
    {
       return;
    }
 
-   // Get the current text attribute.
-
-   if( !GetConsoleScreenBufferInfo( hConsole, &csbi ))
+   if( !GetConsoleScreenBufferInfo(hConsole, &csbi))
    {
       return;
    }
 
-   // Set the buffer's attributes accordingly.
-
-   if( !FillConsoleOutputAttribute( hConsole,         // Handle to console screen buffer
-                                    csbi.wAttributes, // Character attributes to use
-                                    dwConSize,        // Number of cells to set attribute
-                                    coordScreen,      // Coordinates of first cell
-                                    &cCharsWritten )) // Receive number of characters written
+   if(!FillConsoleOutputAttribute(hConsole,
+                                    csbi.wAttributes,
+                                    dwConSize,
+                                    coordScreen,
+                                    &cCharsWritten))
    {
       return;
    }
-
-   // Put the cursor at its home coordinates.
-
    SetConsoleCursorPosition( hConsole, coordScreen );
-}
-
-char **split_on_lines(char *data, char delimiter, int lines_count)
-{
-    char **lines = malloc(sizeof(char*) * lines_count);
-
-    int count = 0;
-    int start = 0;
-
-    for(int i = 0; i < strlen(data); i++){
-        if(data[i] == delimiter)
-        {
-            char *line = substr(data, start, i);
-
-            lines[count] = (char*) malloc(strlen(line));
-            strcpy(lines[count], substr(data, start, i));
-            start = i + 1;
-            count++;
-        }
-    }
-
-    return lines;
-}
-
-char *substr(char *string, int start, int end)
-{
-    char *result = (char*) malloc(end - start + 1);
-    strncpy(result, string + start, end - start);
-    result[end - start] = '\0';
-
-    return result;
-}
-
-int symbol_occurrences_count(char *string, char smb){
-    int count = 0;
-
-    for(int i = 0; i < strlen(string); i++){
-        if(string[i] == smb)
-            count++;
-    }
-
-    return count;
 }
