@@ -10,7 +10,7 @@
   alert_helpers.c
 */
 
-void read_write(int, int, char* buff);
+void read_write(int, int, char* buff, int);
 
 int main(int argc, char *argv[]){
     int file_handle;
@@ -40,7 +40,7 @@ int main(int argc, char *argv[]){
     printf("\nPress ENTER to read file...");
     getchar();
 
-    read_write(file_handle, OUTPUT_HANDLE, buff);
+    read_write(file_handle, OUTPUT_HANDLE, buff, sizeof(buff));
 
     printf("\nPress ENTER to release lock: ");
     getchar();
@@ -58,9 +58,9 @@ int main(int argc, char *argv[]){
     return 0;
 }
 
-void read_write(int read_handle, int write_handle, char *buff){
+void read_write(int read_handle, int write_handle, char *buff, int buffsize){
     ssize_t readed;
 
-    readed = read(read_handle, buff, sizeof(buff));
+    readed = read(read_handle, buff, buffsize);
     write(write_handle, buff, readed);
 }
