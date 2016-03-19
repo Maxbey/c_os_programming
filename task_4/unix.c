@@ -27,23 +27,19 @@ int main(int argc, char *argv[]){
 
     get_success_alert("File \'%s\' opened...\n", argv[1]);
 
-    printf("\nPress ENTER to get lock");
-    getchar();
     printf("Trying to get lock...\n");
 
-    if (fcntl(file_handle, F_SETLKW, &lock) == -1) {
-        get_error_alert("Error on locking\n");
-        exit(1);
+    if (fcntl(file_handle, F_SETLK, &lock) == -1) {
+        get_warning_alert("File is locked\n");
+        if(fcntl(file_handle, F_SETLKW, &lock) == -1){
+          get_error_alert("Err\n");
+        }
     }
     get_success_alert("\nFile successfuly locked\n");
-
-    printf("\nPress ENTER to read file...");
-    getchar();
-
+    printf("File contains: \n");
     read_write(file_handle, OUTPUT_HANDLE, buff, sizeof(buff));
 
-    printf("\nPress ENTER to release lock: ");
-    getchar();
+    sleep(3);
 
     lock.l_type = F_UNLCK;
 
