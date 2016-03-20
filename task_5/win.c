@@ -82,34 +82,15 @@ void cls(HANDLE hConsole)
    CONSOLE_SCREEN_BUFFER_INFO csbi;
    DWORD dwConSize;
 
-   if(!GetConsoleScreenBufferInfo(hConsole, &csbi))
-   {
-      return;
-   }
+   GetConsoleScreenBufferInfo(hConsole, &csbi);
 
    dwConSize = csbi.dwSize.X * csbi.dwSize.Y;
 
-   if( !FillConsoleOutputCharacter(hConsole,
+   FillConsoleOutputCharacter(hConsole,
                                     (TCHAR) ' ',
                                     dwConSize,
                                     coordScreen,
-                                    &cCharsWritten))
-   {
-      return;
-   }
+                                    &cCharsWritten);
 
-   if( !GetConsoleScreenBufferInfo(hConsole, &csbi))
-   {
-      return;
-   }
-
-   if(!FillConsoleOutputAttribute(hConsole,
-                                    csbi.wAttributes,
-                                    dwConSize,
-                                    coordScreen,
-                                    &cCharsWritten))
-   {
-      return;
-   }
    SetConsoleCursorPosition( hConsole, coordScreen );
 }

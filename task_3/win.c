@@ -15,7 +15,6 @@ int main(int argc, char *argv[]){
     HANDLE file_handle;
     DWORD err_code;
     OVERLAPPED overlapped;
-
     HANDLE output_handle = get_output_handle();
 
     memset(&overlapped, 0, sizeof(overlapped));
@@ -30,35 +29,29 @@ int main(int argc, char *argv[]){
 
     if(file_handle == INVALID_HANDLE_VALUE)
     {
-        err_code = GetLastError();
-        get_error_alert("Error on opening / code #%d", err_code);
+        print_error_alert(output_handle, "Error on opening");
         exit(1);
     }
 
-    get_success_alert("\nFile \'%s\' is opened...", argv[1]);
-
-    printf("\nPress ENTER to lock file");
-    getchar();
-
-    printf("\nTrying to get lock...");
-
-    if (!LockFileEx(file_handle, LOCKFILE_EXCLUSIVE_LOCK, 0, 10000, 0, &overlapped))
+    if(!LockFile(file_handle, 0, 0, 10, 10))
     {
-        err_code = GetLastError();
-        get_error_alert("\nError on locking / code #%d", err_code);
-        exit(1);
+      print_warning_alert(output_handle, "File is locked! Waiting...");
+      if (!LockFileEx(file_handle, LOCKFILE_EXCLUSIVE_LOCK, 0, 10000, 0, &overlapped))
+      {
+          err_code = GetLastError();
+          print_error_alert(output_handle, "Error on locking");
+          exit(1);
+      }
     }
-
-    get_success_alert("\nFile successfuly locked\n");
-    printf("\nFile contains: \n");
-
+    print_success_alert(output_handle, "File successfuly locked");
+    Sleep(500);
+    printf("\nFile contains:\n");
     read_write(file_handle, output_handle, buff, sizeof(buff));
 
-    printf("\n\nPress ENTER to realese lock");
-    getchar();
+    Sleep(7000);
 
     UnlockFileEx(file_handle, 0, 10000, 0, &overlapped);
-    get_success_alert("\n File successfuly unlocked");
+    print_success_alert(output_handle, "File successfuly unlocked");
 
     return 0;
 }
