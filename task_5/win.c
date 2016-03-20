@@ -3,7 +3,6 @@
 #include <windows.h>
 #include <winerror.h>
 
-void cls(HANDLE);
 void run(HANDLE, HANDLE);
 
 int main(int argc, char *argv[]){
@@ -30,7 +29,6 @@ int main(int argc, char *argv[]){
   cls(output_handle);
   ReadFile(file_handle, buff, sizeof(buff), &readed, 0);
   WriteFile(output_handle, buff, readed, &written, 0);
-  SetConsoleMode(input_handle, ENABLE_MOUSE_INPUT);
 
   run(input_handle, output_handle);
 
@@ -73,24 +71,4 @@ void run(HANDLE input_handle, HANDLE output_handle){
           }
       }
   }
-}
-
-void cls(HANDLE hConsole)
-{
-   COORD coordScreen = {0, 0};
-   DWORD cCharsWritten;
-   CONSOLE_SCREEN_BUFFER_INFO csbi;
-   DWORD dwConSize;
-
-   GetConsoleScreenBufferInfo(hConsole, &csbi);
-
-   dwConSize = csbi.dwSize.X * csbi.dwSize.Y;
-
-   FillConsoleOutputCharacter(hConsole,
-                                    (TCHAR) ' ',
-                                    dwConSize,
-                                    coordScreen,
-                                    &cCharsWritten);
-
-   SetConsoleCursorPosition( hConsole, coordScreen );
 }
