@@ -2,12 +2,13 @@
 #include <windows.h>
 #include <winerror.h>
 
-void run(HANDLE, HANDLE);
-char* get_word(HANDLE, COORD);
+void run(HANDLE, HANDLE, CONSOLE_SCREEN_BUFFER_INFO);
+char* get_word(HANDLE, COORD, int);
 
 int main(int argc, char *argv[]){
   char buff[1000];
   DWORD readed, written, err_code;
+  CONSOLE_SCREEN_BUFFER_INFO csbi;
 
   HANDLE output_handle = get_output_handle();
   HANDLE input_handle = get_input_handle();
@@ -27,15 +28,16 @@ int main(int argc, char *argv[]){
   }
 
   cls(output_handle);
+  GetConsoleScreenBufferInfo(output_handle, &csbi);
   ReadFile(file_handle, buff, sizeof(buff), &readed, 0);
   WriteFile(output_handle, buff, readed, &written, 0);
 
-  run(input_handle, output_handle);
+  run(input_handle, output_handle, csbi);
 
   return 0;
 }
 
-void run(HANDLE input_handle, HANDLE output_handle){
+void run(HANDLE input_handle, HANDLE output_handle, CONSOLE_SCREEN_BUFFER_INFO csbi){
   INPUT_RECORD console_buff;
   DWORD written;
 
@@ -56,7 +58,7 @@ void run(HANDLE input_handle, HANDLE output_handle){
                   ReadConsoleOutputCharacter(output_handle, (LPTSTR) result, 1, coords, (LPDWORD) &readed);
 
                   if(result[0] != ' ')
-                      get_warning_alert("Selected word: %s\n", get_word(output_handle, coords));
+                      get_warning_alert("Selected word: %s\n", get_word(output_handle, coords, csbi.dwMaximumWindowSize.X));
               }
 
               if(event.dwButtonState == FROM_LEFT_2ND_BUTTON_PRESSED)
@@ -69,7 +71,7 @@ void run(HANDLE input_handle, HANDLE output_handle){
   }
 }
 
-char* get_word(HANDLE output_handle, COORD coords){
+char* get_word(HANDLE output_handle, COORD coords, int string_limit){
   char* result = "";
   DWORD readed;
   char smb[1];
@@ -89,6 +91,9 @@ char* get_word(HANDLE output_handle, COORD coords){
     result[0] = '\0';
     while(1)
     {
+      if(coords.X == string_limit)
+        break;
+
       ReadConsoleOutputCharacter(output_handle, (LPTSTR) smb, 1, coords, (LPDWORD) &readed);
       if(smb[0] == ' '){
         break;

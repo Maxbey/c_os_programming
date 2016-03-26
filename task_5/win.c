@@ -44,7 +44,7 @@ void run(HANDLE input_handle, HANDLE output_handle){
       ReadConsoleInput(input_handle, &console_buff, 1, &written);
       if(console_buff.EventType == MOUSE_EVENT){
           MOUSE_EVENT_RECORD event = console_buff.Event.MouseEvent;
-
+          printf("\n++++ %d", event.dwButtonState);
           if(event.dwEventFlags == 0)
           {
               if(event.dwButtonState == FROM_LEFT_1ST_BUTTON_PRESSED)
