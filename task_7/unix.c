@@ -2,7 +2,10 @@
 #include <stdio.h>
 
 char dictionary[] = "abcdefghijklmnoprstv";
+
 pthread_mutex_t mutex;
+
+void _log(char *);
 
 void thread1(void *arg){
   int k, j;
@@ -43,13 +46,13 @@ void thread3(void *arg){
 
   for (k=0; k < 20; k++){
     if(k == 13){
-      pthread_setcanceltype(PTHREAD_CANCEL_DEFERRED, NULL);
-    }
-    if(k == 16 || k == 17)
+      pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
       pthread_testcancel();
+    }
+
 
     pthread_mutex_lock(&mutex);
-    printf("\033[%d;30H",k+1);
+    printf("\033[%d;30H", k + 1);
     for (j=0; j < (int) arg * 2; j++){
       get_error_alert("%c",dictionary[k]);
     }
@@ -76,14 +79,12 @@ void main(){
   printf("\033[2J\n");
   for (k=0; k<20; k++){
     if(k == 6){
-      printf("\033[0;50H");
-      printf("Trying to cancel the first thread...");
+      _log("Trying to cancel the first thread on step 6");
       int a = pthread_cancel(tid1);
     }
 
     if(k == 11){
-      printf("\033[1;50H");
-      printf("Trying to cancel the second thread...");
+      _log("Trying to cancel the third thread on step 11");
       pthread_cancel(tid3);
     }
 
@@ -94,4 +95,12 @@ void main(){
     usleep(1000000);
   }
   getchar();
+}
+
+void _log(char *message)
+{
+  pthread_mutex_lock(&mutex);
+  printf("\033[0;50H");
+  printf("%s", message);
+  pthread_mutex_unlock(&mutex);
 }

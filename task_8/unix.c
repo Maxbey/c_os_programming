@@ -3,6 +3,7 @@
 #include <string.h>
 #include <semaphore.h>
 
+pthread_mutex_t output_mutex;
 sem_t s_sem, w_sem;
 int readers = 0;
 
@@ -94,6 +95,8 @@ void writer_thread3(void *arg){
 void main(){
   pthread_t r_tid1, r_tid2, r_tid3;
   pthread_t w_tid1, w_tid2, w_tid3;
+
+  pthread_mutex_init(&mutex, NULL);
 
   sem_init(&w_sem, 0, 1);
 	sem_init(&s_sem, 0, 1);
