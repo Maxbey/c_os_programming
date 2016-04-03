@@ -53,6 +53,11 @@ int main(){
 
   for(int i = 0; i < 15; i++)
   {
+    if(400 * (i + 1) > 4000){
+        get_error_alert("\nInsufficient memory to continue the recording\n");
+        break;
+    }
+
     *(add_memory + 400 * (i + 1)) = dictionary[i];
     printf("Char %c written | Memory size is %d\n", dictionary[i], 400 * (i + 1));
     Sleep(1000);
