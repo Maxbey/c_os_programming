@@ -5,7 +5,6 @@
 int main(){
   char *mem_pointer;
   char *add_memory = NULL;
-  char offset;
 
   char dictionary[] = "abcdefghijklmnoprstv";
 
